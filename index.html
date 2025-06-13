@@ -36,105 +36,74 @@
   </style>
 </head>
 <body>
-  <h2>🔍 Scanner Cripto – Detecção de Volume Anormal</h2>
-  <p><strong>Objetivo:</strong> identificar criptomoedas que apresentam <strong>volume de negociação desproporcional ao seu Market Cap</strong>.</p>
-  <p>O sistema monitora mais de 2000 tokens diariamente e exibe aqueles com:</p>
-  <ul>
-    <li>Volume ≥ 3x o Market Cap</li>
-    <li>Market Cap entre 10M e 600M</li>
-    <li>Exclusão automática de stablecoins</li>
-  </ul>
-  <p>As colunas <strong>V:Vol %</strong> e <strong>V:MCap %</strong> mostram a variação percentual desde a última leitura, com emojis indicando a tendência 📈 📉 ➡️.</p>
-  <p><strong>Prob 5% (48h):</strong> estimativa baseada em dados técnicos da chance da moeda valorizar 5% ou mais nas próximas 48 horas.</p>
-  <p><strong>🔒 Acesso restrito:</strong> apenas e-mails autorizados podem visualizar as análises completas.</p>
-  <p>📲 <strong>Fale comigo no WhatsApp:</strong> <a href="https://wa.me/5521982252303" target="_blank">Clique aqui para conversar diretamente</a></p>
-
-  <div class="status">⏳ Carregando dados...</div>
-  <div>
-    <h3>📝 Anotações Pessoais</h3>
-    <textarea placeholder="Escreva aqui suas observações sobre as criptos..."></textarea>
-  </div>
-  <div class="contagem"></div>
-
-  <table id="painel" class="display nowrap" style="display:none;">
-    <thead><tr></tr></thead>
-    <tbody></tbody>
-  </table>
-
-  <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-  <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
-  <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
-
   <script>
-    const url = 'https://script.google.com/macros/s/AKfycbyEqRe8R__N4kLrXqYi_QWS1ROaQULNngDxV41h2_wFIJx8_u0sES1Xx5pIX3s-ByDtNQ/exec';
+  const url = 'https://script.google.com/macros/s/AKfycbyEqRe8R__N4kLrXqYi_QWS1ROaQULNngDxV41h2_wFIJx8_u0sES1Xx5pIX3s-ByDtNQ/exec';
 
-    fetch(url)
-      .then(res => res.json())
-      .then(data => {
-        if (!data || data.length === 0) {
-          document.querySelector(".status").textContent = "Nenhum dado encontrado.";
-          return;
-        }
+  // 🔁 Recuperar anotações do navegador
+  window.onload = function () {
+    const campo = document.querySelector("textarea");
+    campo.value = localStorage.getItem("anotacoes") || "";
+    campo.addEventListener("input", () => {
+      localStorage.setItem("anotacoes", campo.value);
+    });
+  };
 
-        const headers = Object.keys(data[0]);
-        const thead = document.querySelector("#painel thead tr");
-        headers.forEach(h => {
-          const th = document.createElement("th");
-          th.textContent = h;
-          thead.appendChild(th);
-        });
+  fetch(url)
+    .then(res => res.json())
+    .then(data => {
+      if (!data || data.length === 0) {
+        document.querySelector(".status").textContent = "Nenhum dado encontrado.";
+        return;
+      }
 
-        const tbody = document.querySelector("#painel tbody");
-        data.forEach(row => {
-          const tr = document.createElement("tr");
-          headers.forEach(h => {
-            const td = document.createElement("td");
-            let valor = row[h];
-
-            // Link
-            if (h === "🔗" && typeof valor === "string") {
-              td.innerHTML = `<a href="${valor}" target="_blank">🔗</a>`;
-            }
-            // Emoji tendência
-            else if (h === "↕️") {
-              td.textContent = valor;
-              if (valor === "📈") td.style.color = "green";
-              else if (valor === "📉") td.style.color = "red";
-              else td.style.color = "gray";
-            }
-            // Numéricos alinhados
-            else if (!isNaN(valor)) {
-              td.style.textAlign = "right";
-              td.textContent = valor;
-            }
-            else {
-              td.textContent = valor;
-            }
-
-            tr.appendChild(td);
-          });
-          tbody.appendChild(tr);
-        });
-
-        document.querySelector("#painel").style.display = "table";
-        document.querySelector(".status").style.display = "none";
-        document.querySelector(".contagem").textContent = `🔢 Total de moedas carregadas: ${data.length}`;
-
-        new DataTable('#painel', {
-          responsive: true,
-          dom: 'Bfrtip',
-          buttons: ['csv', 'excel'],
-          pageLength: 25,
-          order: [[5, 'desc']]
-        });
-      })
-      .catch(err => {
-        document.querySelector(".status").textContent = "❌ Erro ao carregar dados.";
-        console.error(err);
+      const headers = Object.keys(data[0]);
+      const thead = document.querySelector("#painel thead tr");
+      headers.forEach(h => {
+        const th = document.createElement("th");
+        th.textContent = h;
+        thead.appendChild(th);
       });
+
+      const tbody = document.querySelector("#painel tbody");
+      data.forEach(row => {
+        const tr = document.createElement("tr");
+        headers.forEach(h => {
+          const td = document.createElement("td");
+          let valor = row[h];
+
+          if (h === "🔗" && typeof valor === "string") {
+            td.innerHTML = `<a href="${valor}" target="_blank">🔗</a>`;
+          } else if (h === "↕️") {
+            td.textContent = valor;
+            if (valor === "📈") td.style.color = "green";
+            else if (valor === "📉") td.style.color = "red";
+            else td.style.color = "gray";
+          } else if (!isNaN(valor)) {
+            td.style.textAlign = "right";
+            td.textContent = valor;
+          } else {
+            td.textContent = valor;
+          }
+
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      });
+
+      document.querySelector("#painel").style.display = "table";
+      document.querySelector(".status").style.display = "none";
+      document.querySelector(".contagem").textContent = `🔢 Total de moedas carregadas: ${data.length}`;
+
+      new DataTable('#painel', {
+        responsive: true,
+        paging: false, // ✅ sem paginação
+        dom: 'Bfrtip',
+        buttons: ['csv', 'excel'],
+        order: [[5, 'desc']]
+      });
+    })
+    .catch(err => {
+      document.querySelector(".status").textContent = "❌ Erro ao carregar dados.";
+      console.error(err);
+    });
   </script>
-</body>
-</html>
