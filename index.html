@@ -44,7 +44,7 @@
     <li>Market Cap entre 10M e 600M</li>
     <li>Exclusão automática de stablecoins</li>
   </ul>
-  <p>As colunas <strong>V:Vol %</strong> e <strong>V:MCap %</strong> mostram a variação percentual desde a última leitura, com emojis indicando a tendência 📈 📉 ➡️.</p>
+  <p>As colunas <strong>V:Vol %</strong> e <strong>V:MC %</strong> mostram a variação percentual desde a última leitura, com emojis indicando a tendência 📈 📉 ➡️.</p>
   <p><strong>Prob 5% (48h):</strong> estimativa baseada em dados técnicos da chance da moeda valorizar 5% ou mais nas próximas 48 horas.</p>
   <p><strong>🔒 Acesso restrito:</strong> apenas e-mails autorizados podem visualizar as análises completas.</p>
   <p>📲 <strong>Fale comigo no WhatsApp:</strong> <a href="https://wa.me/5521982252303" target="_blank">Clique aqui para conversar diretamente</a></p>
@@ -71,7 +71,7 @@
   <script>
     const url = 'https://script.google.com/macros/s/AKfycbyEqRe8R__N4kLrXqYi_QWS1ROaQULNngDxV41h2_wFIJx8_u0sES1Xx5pIX3s-ByDtNQ/exec';
 
-    // Recuperar anotações ao abrir a página
+    // Salvar e recuperar anotações
     window.onload = function () {
       const campo = document.getElementById("campoAnotacoes");
       campo.value = localStorage.getItem("anotacoesVolumeScanner") || "";
@@ -113,6 +113,14 @@
             } else if (!isNaN(valor)) {
               td.style.textAlign = "right";
               td.textContent = valor;
+
+              // Aplicar cor à coluna "V:MC %"
+              if (h === "V:MC %") {
+                const num = parseFloat(valor);
+                if (num >= 1000) td.style.background = "#ffb6c1"; // rosa claro
+                else if (num >= 500) td.style.background = "#fff68f"; // amarelo claro
+                else if (num >= 300) td.style.background = "#b0ffb0"; // verde claro
+              }
             } else {
               td.textContent = valor;
             }
@@ -128,7 +136,7 @@
 
         new DataTable('#painel', {
           responsive: true,
-          paging: false, // 👈 Sem paginação
+          paging: false,
           dom: 'Bfrtip',
           buttons: ['csv', 'excel'],
           order: [[5, 'desc']]
