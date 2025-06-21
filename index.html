@@ -71,7 +71,7 @@
   <script>
     const url = 'https://script.google.com/macros/s/AKfycbyEqRe8R__N4kLrXqYi_QWS1ROaQULNngDxV41h2_wFIJx8_u0sES1Xx5pIX3s-ByDtNQ/exec';
 
-    // Função para formatar valores monetários
+    // Função para formatar valores em dólares com sufixo
     function formatarValorDolar(valor) {
       const num = parseFloat(valor);
       if (isNaN(num)) return valor;
@@ -81,7 +81,7 @@
       return `$${num.toFixed(2)}`;
     }
 
-    // Anotações salvas localmente
+    // Recuperar anotações do localStorage
     window.onload = function () {
       const campo = document.getElementById("campoAnotacoes");
       campo.value = localStorage.getItem("anotacoesVolumeScanner") || "";
@@ -123,12 +123,14 @@
             } else if (!isNaN(valor)) {
               td.style.textAlign = "right";
 
-              if (["mcap", "vol24h"].includes(h.toLowerCase())) {
+              // Aplica formatação monetária se for Market Cap ou Volume
+              if (h.toLowerCase().includes("mcap") || h.toLowerCase().includes("vol")) {
                 td.textContent = formatarValorDolar(valor);
               } else {
                 td.textContent = valor;
               }
 
+              // Cor de fundo para coluna "V:MC %"
               if (h === "V:MC %") {
                 const num = parseFloat(valor);
                 if (num >= 1000) td.style.background = "#ffb6c1";
