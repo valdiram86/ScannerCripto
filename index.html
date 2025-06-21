@@ -71,7 +71,17 @@
   <script>
     const url = 'https://script.google.com/macros/s/AKfycbyEqRe8R__N4kLrXqYi_QWS1ROaQULNngDxV41h2_wFIJx8_u0sES1Xx5pIX3s-ByDtNQ/exec';
 
-    // Salvar e recuperar anotações
+    // Função para formatar valores monetários
+    function formatarValorDolar(valor) {
+      const num = parseFloat(valor);
+      if (isNaN(num)) return valor;
+      if (num >= 1e9) return `$${(num / 1e9).toFixed(2)}B`;
+      if (num >= 1e6) return `$${(num / 1e6).toFixed(2)}M`;
+      if (num >= 1e3) return `$${(num / 1e3).toFixed(2)}K`;
+      return `$${num.toFixed(2)}`;
+    }
+
+    // Anotações salvas localmente
     window.onload = function () {
       const campo = document.getElementById("campoAnotacoes");
       campo.value = localStorage.getItem("anotacoesVolumeScanner") || "";
@@ -112,14 +122,18 @@
               else td.style.color = "gray";
             } else if (!isNaN(valor)) {
               td.style.textAlign = "right";
-              td.textContent = valor;
 
-              // Aplicar cor à coluna "V:MC %"
+              if (["mcap", "vol24h"].includes(h.toLowerCase())) {
+                td.textContent = formatarValorDolar(valor);
+              } else {
+                td.textContent = valor;
+              }
+
               if (h === "V:MC %") {
                 const num = parseFloat(valor);
-                if (num >= 1000) td.style.background = "#ffb6c1"; // rosa claro
-                else if (num >= 500) td.style.background = "#fff68f"; // amarelo claro
-                else if (num >= 300) td.style.background = "#b0ffb0"; // verde claro
+                if (num >= 1000) td.style.background = "#ffb6c1";
+                else if (num >= 500) td.style.background = "#fff68f";
+                else if (num >= 300) td.style.background = "#b0ffb0";
               }
             } else {
               td.textContent = valor;
